@@ -36,6 +36,8 @@ In this study, I aim to measure the association between race and access to healt
 
 # Data and Methods
 
+The data used in this study was sourced from IPUMS USA, an organization that provides access to United States census data with enhanced documentation. The data was accessed on May 5th via data extract function on the organization's website. The sample includes 3,064 households and 6,405 indivuals from 2017 to 2018, and it is generalizable to the population of the United States. 
+
 # Results
 
 # Conclusions

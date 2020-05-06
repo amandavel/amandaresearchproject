@@ -1,5 +1,9 @@
 # Input Directory
 
-This directory should contain unedited data files directly from the source. I typically put different data sources into different sub-directories and include any relevant data documentation in the same directory. 
+Data is sourced from IPUMS; "IPUMS USA collects, preserves and harmonizes U.S. census microdata 
+and provides easy access to this data with enhanced documentation. Data includes decennial
+censuses from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the present."
 
-Following the guidelines of [Code and Data](https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml#magicparlabel-270), this directory is dedicated to raw data from other sources ONLY. Datasets in this input directory should NEVER be edited. If newer data extracts are used, older raw data should just be replaced and changes commmitted. Constructed datasets should NEVER be placed in this directory. 
+Link: https://usa.ipums.org/usa/
+
+Data details the 2017-2018 US Census; specifically, race, SEI, health insurance coverage
