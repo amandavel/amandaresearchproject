@@ -6,4 +6,4 @@ censuses from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the
 
 Link: https://usa.ipums.org/usa/
 
-Data details the 2017-2018 US Census; specifically, race, SEI, health insurance coverage
+Data details the 2017-2018 US Census; specifically, race, SEI, health insurance coverage, and urban/rural status. 
