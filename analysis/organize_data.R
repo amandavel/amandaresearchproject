@@ -17,10 +17,16 @@ ipumsdata <- read_fwf("input/usa_00007.dat.gz",
                                                     end  =c(4,10,18,31,41,54,66,67,71,81,82,85,86,89,90,91,92,94),
                                                     col_names=c("year","sample","serial","cbserial","hhwt",
                                                                 "cluster","strata","gq", "pernum", "perwt",
+<<<<<<< HEAD
                                                                 "race","raced","hispan","hispand","hcovany","hcovpriv","hinsihs","sei")))
                
 #drop cases that are missing on  SEI 
 ipumsdata <- subset(ipumsdata, sei>0)
+=======
+                                                                "race","raced","hispan","hispand","hcovany","hcovpriv","hinsihs","sei")),
+                      col_types = cols(.default = "i", cluster = "d", cbserial = "d"), 
+                      progress = TRUE)
+>>>>>>> e6238ddaa76de57f7c37e7926978daaae0077ead
 
 #drop the cbserial and cluster variables
 ipumsdata <- subset(ipumsdata,
