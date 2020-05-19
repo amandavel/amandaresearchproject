@@ -9,6 +9,7 @@
 #source in any useful functions
 source("check_packages.R")
 source("useful_functions.R")
+load("input/usa_00007.dat.gz")
 
 #read in the IPUMS fixed-width data from gzip file and ensure all variables are read in as integers
 ipumsdata <- read_fwf("input/usa_00007.dat.gz", 
@@ -16,9 +17,14 @@ ipumsdata <- read_fwf("input/usa_00007.dat.gz",
                                                     end  =c(4,10,18,31,41,54,66,67,71,81,82,85,86,89,90,91,92,94),
                                                     col_names=c("year","sample","serial","cbserial","hhwt",
                                                                 "cluster","strata","gq", "pernum", "perwt",
-                                                                "race","raced","hispan","hispand","hcovany","hcovpriv","hinsihs","sei")),
-                      col_types = cols(.default = "i"), 
-                      progress = TRUE)
+                                                                "race","raced","hispan","hispand","hcovany","hcovpriv","hinsihs","sei")))
+               
+#drop cases that are missing on  SEI 
+ipumsdata <- subset(ipumsdata, sei>0)
 
-#drop cases that are missing on cluster or SEI 
-ipumsdata <- subset(ipumsdata, cluster>0 &  sei>0)
+#drop the cbserial and cluster variables
+ipumsdata <- subset(ipumsdata,
+                 select=c("cluster","cbserial"))
+
+
+head(ipumsdata)
