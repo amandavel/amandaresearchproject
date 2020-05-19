@@ -29,3 +29,7 @@ ipumsdata <- subset(ipumsdata,
                  select=c("cluster","cbserial"))
 
 head(ipumsdata)
+
+
+#final code to preserve formatting of final analytical dataset
+save(cleaned_dataset, file="output/analytical_data.RData")
