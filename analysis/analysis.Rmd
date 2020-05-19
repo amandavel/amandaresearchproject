@@ -12,6 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 source("check_packages.R")
 source("useful_functions.R")
+load("output/analytical_data.RData")
 ```
 
 # Introduction
