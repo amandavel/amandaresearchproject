@@ -17,7 +17,7 @@ ipumsdata <- read_fwf("input/usa_00007.dat.gz",
                                                     col_names=c("year","sample","serial","cbserial","hhwt",
                                                                 "cluster","strata","gq", "pernum", "perwt",
                                                                 "race","raced","hispan","hispand","hcovany","hcovpriv","hinsihs","sei")),
-                      col_types = cols(.default = "i"), 
+                      col_types = cols(.default = "i", cluster = "d", cbserial = "d"), 
                       progress = TRUE)
 
 #drop cases that are missing on cluster or SEI 
