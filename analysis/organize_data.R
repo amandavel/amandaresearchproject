@@ -22,16 +22,18 @@ ipumsdata <- read_fwf("input/usa_00010.dat.gz",
 ##Converting numeric codes for categorical variables into proper factor variables
 
 #Marriage status 
-ipumsdata$marriage <- NA
-ipumsdata$marriage[ipumsdata$marst==1] <- "MarriedSP"
-ipumsdata$marriage[ipumsdata$marst==2] <- "MarriedSA"
-ipumsdata$marriage[ipumsdata$marst==3] <- "Separated"
-ipumsdata$marriage[ipumsdata$marst==4] <- "Divorced"
-ipumsdata$marriage[ipumsdata$marst==5] <- "Widowed"
-ipumsdata$marriage[ipumsdata$marst==6] <- "Single"
-ipumsdata$marriage <- factor(ipumsdata$marriage,
-                     levels=c("MarriedSP","MarriedSA","Seperated","Divorced","Widowed","Single"))
-table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL)
+
+ipumsdata$marriage <- factor(ifelse(ipumsdata$marst==1 | 
+                                                ipumsdata$marst==2, "Married",
+                                                   ifelse(ipumsdata$marst==3 |
+                                                            ipumsdata$marst==4 |
+                                                              ipumsdata$marst==5 | 
+                                                                ipumsdata$marst==6,"NotMarried")),
+                              levels=c("Married","NotMarried"))
+
+table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL) 
+summary(ipumsdata$marriage)
+
 
 #Employment status 
 ipumsdata$employment <- NA
@@ -88,7 +90,6 @@ ipumsdata$racecombo <- factor(ifelse(ipumsdata$hispan!=0,"Hispanic",
                                                                    ipumsdata$race==6,"NH API","NH Other/Multi"))))),
                               levels=c("NH White", "NH Black", "Hispanic", "NH API", "NH AIAN", "NH Other/Multi"))
 
-#check yourself before you wreck yourself
 table(ipumsdata$race, ipumsdata$racecombo, exclude=NULL) 
 table(ipumsdata$hispan, ipumsdata$racecombo, exclude=NULL) 
 summary(ipumsdata$racecombo)
@@ -112,6 +113,10 @@ summary(ipumsdata$privatehi)
 
 ipumsdata$anyhins[ipumsdata$ihs==0] <- NA
 summary(ipumsdata$anyhins)
+
+#Collapsing categories in categorical variables into smaller sets.
+table(ipumsdata$marriage)
+
 
 #final code to preserve formatting of final analytical dataset
 save(ipumsdata, file="output/analytical_data.RData")
