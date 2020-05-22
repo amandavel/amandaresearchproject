@@ -9,16 +9,14 @@
 #source in any useful functions
 source("check_packages.R")
 source("useful_functions.R")
-load("input/usa_00008.dat.gz")
 
 #read in the IPUMS fixed-width data from gzip file and ensure all variables are read in as integers
-ipumsdata <- read_fwf("input/usa_00008.dat.gz", 
-                      col_positions = fwf_positions(start=c(1,5, 11,19,32,42,55,67,68,72,82,83,86,87,90,91,92,93),
-                                                    end  =c(4,10,18,31,41,54,66,67,71,81,82,85,86,89,90,91,92,94),
-                                                    col_names=c("year","sample","serial","cbserial","hhwt",
-                                                                "cluster","strata","gq", "pernum", "perwt",
-                                                                "race","raced","hispan","hispand","hcovany","hcovpriv","hinsihs","sei")),
-                      col_types = cols(.default = "i", cluster = "d", cbserial = "d"), 
+ipumsdata <- read_fwf("input/usa_00010.dat.gz", 
+                      col_positions = fwf_positions(start=c(1,11,24,25,37,47,50,51,52,55,56,59,60,61,62,63),
+                                                    end  =c(10,23,24,36,46,49,50,51,54,55,58,59,60,61,62,64),
+                                                    col_names=c("hhwt","cluster","metro","strata","perwt","age","marst","race",
+                                                                "raced","hispand","hcovany","hcovpriv","hinsihs","empstat","empstatd")),
+                      col_types = cols(.default = "i", cluster = "d"), 
                       progress = TRUE)
 
 #drop cases that are missing on  SEI 
