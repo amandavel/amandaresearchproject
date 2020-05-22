@@ -19,15 +19,66 @@ ipumsdata <- read_fwf("input/usa_00010.dat.gz",
                       col_types = cols(.default = "i", cluster = "d"), 
                       progress = TRUE)
 
-#drop cases that are missing on  SEI 
-ipumsdata <- subset(ipumsdata, sei>0)
+#converting numeric codes for categorical variables into proper factor variables
 
-#drop the cbserial and cluster variables
-ipumsdata <- subset(ipumsdata,
-                 select=c("cluster","cbserial"))
+#Marriage status 
+ipumsdata$marriage <- NA
+ipumsdata$marriage[ipumsdata$marst==1] <- "MarriedSP"
+ipumsdata$marriage[ipumsdata$marst==2] <- "MarriedSA"
+ipumsdata$marriage[ipumsdata$marst==3] <- "Separated"
+ipumsdata$marriage[ipumsdata$marst==4] <- "Divorced"
+ipumsdata$marriage[ipumsdata$marst==5] <- "Widowed"
+ipumsdata$marriage[ipumsdata$marst==6] <- "Single"
+ipumsdata$marriage <- factor(ipumsdata$marriage,
+                     levels=c("MarriedSP","MarriedSA","Seperated","Divorced","Widowed","Single"))
+table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL)
 
-head(ipumsdata)
+#Employment status 
+ipumsdata$employment <- NA
+ipumsdata$employment[ipumsdata$empstat==0] <- "NA"
+ipumsdata$employment[ipumsdata$empstat==1] <- "Employed"
+ipumsdata$employment[ipumsdata$empstat==2] <- "Unemployed"
+ipumsdata$employment[ipumsdata$empstat==3] <- "NILF"
+ipumsdata$employment <- factor(ipumsdata$employment,
+                             levels=c("NA","Employed","Unemployed","NILF"))
+table(ipumsdata$empstat, ipumsdata$employment, exclude=NULL)
 
+#Health insurance through Indian Health Service
+ipumsdata$ihs <- NA
+ipumsdata$ihs[ipumsdata$hinsihs==1] <- "IHSCoverage"
+ipumsdata$ihs[ipumsdata$hinsihs==2] <- "NoIHSCoverage"
+ipumsdata$ihs <- factor(ipumsdata$ihs,
+                               levels=c("IHSCoverage","NoIHSCoverage"))
+table(ipumsdata$hinsihs, ipumsdata$ihs, exclude=NULL)
+
+#Private Health insurance coverage
+ipumsdata$privatehi <- NA
+ipumsdata$privatehi[ipumsdata$hcovpriv==1] <- "PrivateHINS"
+ipumsdata$privatehi[ipumsdata$hcovpriv==2] <- "NoPrivateHINS"
+ipumsdata$privatehi <- factor(ipumsdata$privatehi,
+                               levels=c("PrivateHINS","NoPrivateHINS"))
+table(ipumsdata$hcovpriv, ipumsdata$privatehi, exclude=NULL)
+
+#Any health health insurance coverage
+ipumsdata$privatehi <- NA
+ipumsdata$privatehi[ipumsdata$hcovpriv==1] <- "PrivateHINS"
+ipumsdata$privatehi[ipumsdata$hcovpriv==2] <- "NoPrivateHINS"
+ipumsdata$privatehi <- factor(ipumsdata$privatehi,
+                              levels=c("PrivateHINS","NoPrivateHINS"))
+table(ipumsdata$hcovpriv, ipumsdata$privatehi, exclude=NULL)
+
+#Metro status 
+ipumsdata$metros <- NA
+ipumsdata$metros[ipumsdata$metro==0] <- "Mixed"
+ipumsdata$metros[ipumsdata$metro==1] <- "NotMetro"
+ipumsdata$metros[ipumsdata$metro==2] <- "CentralCity"
+ipumsdata$metros[ipumsdata$metro==3] <- "NotCentralCity"
+ipumsdata$metros[ipumsdata$metro==4] <- "CSMixed"
+ipumsdata$metros <- factor(ipumsdata$metros,
+                              levels=c("Mixed","NotMetro","CentralCity","NotCentralCity","CSMixed"))
+table(ipumsdata$metro, ipumsdata$metros, exclude=NULL)
+
+#Race
 
 #final code to preserve formatting of final analytical dataset
 save(cleaned_dataset, file="output/analytical_data.RData")
