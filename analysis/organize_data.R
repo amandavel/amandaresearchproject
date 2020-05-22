@@ -15,7 +15,7 @@ ipumsdata <- read_fwf("input/usa_00010.dat.gz",
                       col_positions = fwf_positions(start=c(1,11,24,25,37,47,50,51,52,55,56,59,60,61,62,63),
                                                     end  =c(10,23,24,36,46,49,50,51,54,55,58,59,60,61,62,64),
                                                     col_names=c("hhwt","cluster","metro","strata","perwt","age","marst","race",
-                                                                "raced","hispand","hcovany","hcovpriv","hinsihs","empstat","empstatd")),
+                                                                "raced","hispan","hispand","hcovany","hcovpriv","hinsihs","empstat","empstatd")),
                       col_types = cols(.default = "i", cluster = "d"), 
                       progress = TRUE)
 
