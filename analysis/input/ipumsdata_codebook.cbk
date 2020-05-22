@@ -26,7 +26,7 @@ Case Selection:               Yes
   HISPAND            P  56-58           3      X       X 
   HCOVANY            P  59              1      X       X 
   HCOVPRIV           P  60              1      X       X 
-  HINSIHS            P  61              1      X       X 
+  HINSIHS            P  61              1      X        X 
   EMPSTAT            P  62              1      X       X 
   EMPSTATD           P  63-64           2      X       X 
 

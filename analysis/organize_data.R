@@ -60,12 +60,12 @@ ipumsdata$privatehi <- factor(ipumsdata$privatehi,
 table(ipumsdata$hcovpriv, ipumsdata$privatehi, exclude=NULL)
 
 #Any health health insurance coverage
-ipumsdata$privatehi <- NA
-ipumsdata$privatehi[ipumsdata$hcovpriv==1] <- "PrivateHINS"
-ipumsdata$privatehi[ipumsdata$hcovpriv==2] <- "NoPrivateHINS"
-ipumsdata$privatehi <- factor(ipumsdata$privatehi,
-                              levels=c("PrivateHINS","NoPrivateHINS"))
-table(ipumsdata$hcovpriv, ipumsdata$privatehi, exclude=NULL)
+ipumsdata$anyhins <- NA
+ipumsdata$anyhins[ipumsdata$hcovany==1] <- "NoHealthInsurance"
+ipumsdata$anyhins[ipumsdata$hcovany==2] <- "HealthInsurance"
+ipumsdata$anyhins <- factor(ipumsdata$anyhins,
+                              levels=c("NoHealthInsurance","HealthInsurance"))
+table(ipumsdata$hcovany, ipumsdata$anyhins, exclude=NULL)
 
 #Metro status 
 ipumsdata$metros <- NA
@@ -78,9 +78,40 @@ ipumsdata$metros <- factor(ipumsdata$metros,
                               levels=c("Mixed","NotMetro","CentralCity","NotCentralCity","CSMixed"))
 table(ipumsdata$metro, ipumsdata$metros, exclude=NULL)
 
-#Race
+##Creating a racecombo variable and making it a factor variable
+ipumsdata$racecombo <- factor(ifelse(ipumsdata$hispan!=0,"Hispanic",
+                                     ifelse(ipumsdata$race==1, "NH White",
+                                            ifelse(ipumsdata$race==2, "NH Black",
+                                                   ifelse(ipumsdata$race==3, "NH AIAN",
+                                                          ifelse(ipumsdata$race==4 | 
+                                                                   ipumsdata$race==5 | 
+                                                                   ipumsdata$race==6,"NH API","NH Other/Multi"))))),
+                              levels=c("NH White", "NH Black", "Hispanic", "NH API", "NH AIAN", "NH Other/Multi"))
+
+#check yourself before you wreck yourself
+table(ipumsdata$race, ipumsdata$racecombo, exclude=NULL) 
+table(ipumsdata$hispan, ipumsdata$racecombo, exclude=NULL) 
+summary(ipumsdata$racecombo)
 
 ##Replace numeric codes for missing values with NA values
 
+ipumsdata$age[ipumsdata$age==0] <- NA
+summary(ipumsdata$age)
+
+ipumsdata$marriage[ipumsdata$marriage==0] <- NA
+summary(ipumsdata$marriage)
+
+ipumsdata$employment[ipumsdata$employment==0] <- NA
+summary(ipumsdata$employment)
+
+ipumsdata$ihs[ipumsdata$ihs==0] <- NA
+summary(ipumsdata$ihs)
+
+ipumsdata$privatehi[ipumsdata$ihs==0] <- NA
+summary(ipumsdata$privatehi)
+
+ipumsdata$anyhins[ipumsdata$ihs==0] <- NA
+summary(ipumsdata$anyhins)
+
 #final code to preserve formatting of final analytical dataset
-save(cleaned_dataset, file="output/analytical_data.RData")
+save(ipumsdata, file="output/analytical_data.RData")
