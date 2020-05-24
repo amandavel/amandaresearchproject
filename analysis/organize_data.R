@@ -19,10 +19,10 @@ ipumsdata <- read_fwf("input/usa_00010.dat.gz",
                       col_types = cols(.default = "i", cluster = "d"), 
                       progress = TRUE)
 
-##Converting numeric codes for categorical variables into proper factor variables
+##Converting numeric codes for categorical variables into proper factor variables AND 
+##collapsing categories in categorical variables into smaller sets.
 
 #Marriage status 
-
 ipumsdata$marriage <- factor(ifelse(ipumsdata$marst==1 | 
                                                 ipumsdata$marst==2, "Married",
                                                    ifelse(ipumsdata$marst==3 |
@@ -47,16 +47,16 @@ table(ipumsdata$empstat, ipumsdata$employment, exclude=NULL)
 
 #Health insurance through Indian Health Service
 ipumsdata$ihs <- NA
-ipumsdata$ihs[ipumsdata$hinsihs==1] <- "IHSCoverage"
-ipumsdata$ihs[ipumsdata$hinsihs==2] <- "NoIHSCoverage"
+ipumsdata$ihs[ipumsdata$hinsihs==1] <- "NoIHSCoverage"
+ipumsdata$ihs[ipumsdata$hinsihs==2] <- "IHSCoverage"
 ipumsdata$ihs <- factor(ipumsdata$ihs,
                                levels=c("IHSCoverage","NoIHSCoverage"))
 table(ipumsdata$hinsihs, ipumsdata$ihs, exclude=NULL)
 
 #Private Health insurance coverage
 ipumsdata$privatehi <- NA
-ipumsdata$privatehi[ipumsdata$hcovpriv==1] <- "PrivateHINS"
-ipumsdata$privatehi[ipumsdata$hcovpriv==2] <- "NoPrivateHINS"
+ipumsdata$privatehi[ipumsdata$hcovpriv==1] <- "NoPrivateHINS"
+ipumsdata$privatehi[ipumsdata$hcovpriv==2] <- "PrivateHINS"
 ipumsdata$privatehi <- factor(ipumsdata$privatehi,
                                levels=c("PrivateHINS","NoPrivateHINS"))
 table(ipumsdata$hcovpriv, ipumsdata$privatehi, exclude=NULL)
@@ -114,9 +114,12 @@ summary(ipumsdata$privatehi)
 ipumsdata$anyhins[ipumsdata$ihs==0] <- NA
 summary(ipumsdata$anyhins)
 
-#Collapsing categories in categorical variables into smaller sets.
-table(ipumsdata$marriage)
+##Removing all unneeded variables
 
+ipumsdata <- subset(ipumsdata, 
+              select=c("hhwt","cluster","metro","strata","perwt","age","racecombo","marriage",
+                       "employment","ihs","privatehi","anyhins","metros"))
+ipumsdata
 
 #final code to preserve formatting of final analytical dataset
 save(ipumsdata, file="output/analytical_data.RData")
