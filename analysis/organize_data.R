@@ -23,17 +23,17 @@ ipumsdata <- read_fwf("input/usa_00010.dat.gz",
 ##collapsing categories in categorical variables into smaller sets.
 
 #Marriage status 
-ipumsdata$marriage <- factor(ifelse(ipumsdata$marst==1 | 
-                                                ipumsdata$marst==2, "Married",
-                                                   ifelse(ipumsdata$marst==3 |
-                                                            ipumsdata$marst==4 |
-                                                              ipumsdata$marst==5 | 
-                                                                ipumsdata$marst==6,"NotMarried")),
-                              levels=c("Married","NotMarried"))
 
-table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL) 
-summary(ipumsdata$marriage)
-
+ipumsdata$marriage <- NA
+ipumsdata$marriage[ipumsdata$marst==1] <- "MarriedSP"
+ipumsdata$marriage[ipumsdata$marst==2] <- "MarriedSA"
+ipumsdata$marriage[ipumsdata$marst==3] <- "Separated"
+ipumsdata$marriage[ipumsdata$marst==4] <- "Divorced"
+ipumsdata$marriage[ipumsdata$marst==5] <- "Widowed"
+ipumsdata$marriage[ipumsdata$marst==6] <- "Single"
+ipumsdata$marriage <- factor(ipumsdata$marriage,
+                             levels=c("MarriedSP","MarriedSA","Seperated","Divorced","Widowed","Single"))
+table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL)
 
 #Employment status 
 ipumsdata$employment <- NA
@@ -113,6 +113,41 @@ summary(ipumsdata$privatehi)
 
 ipumsdata$anyhins[ipumsdata$ihs==0] <- NA
 summary(ipumsdata$anyhins)
+
+#Collapsing Variables 
+
+#Marriage
+ipumsdata$marriage <- factor(ifelse(ipumsdata$marst==1 | 
+                                      ipumsdata$marst==2, "Married",
+                                    ifelse(ipumsdata$marst==3 |
+                                             ipumsdata$marst==4 |
+                                             ipumsdata$marst==5 | 
+                                             ipumsdata$marst==6,"NotMarried", NA)),
+                             levels=c("Married","NotMarried"))
+
+table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL) 
+summary(ipumsdata$marriage)
+
+#Employment status 
+
+ipumsdata$employment <- factor(ifelse(ipumsdata$empstat==1, "Employed",
+                                    ifelse(ipumsdata$empstat==2 |
+                                             ipumsdata$empstat==3,"Unemployed", NA)),
+                             levels=c("Employed","Unemployed"))
+
+table(ipumsdata$empstat, ipumsdata$employment, exclude=NULL) 
+summary(ipumsdata$employment)
+
+#Metro status 
+ipumsdata$metros <- factor(ifelse(ipumsdata$marst==1, "NotMetro",
+                                    ifelse(ipumsdata$marst==2 |
+                                             ipumsdata$marst==3 |
+                                             ipumsdata$marst==4, "Metro", NA)),
+                             levels=c("Metro","NotMetro"))
+
+table(ipumsdata$metro, ipumsdata$metros, exclude=NULL) 
+summary(ipumsdata$metros)
+
 
 ##Removing all unneeded variables
 
