@@ -32,17 +32,16 @@ ipumsdata$marriage[ipumsdata$marst==4] <- "Divorced"
 ipumsdata$marriage[ipumsdata$marst==5] <- "Widowed"
 ipumsdata$marriage[ipumsdata$marst==6] <- "Single"
 ipumsdata$marriage <- factor(ipumsdata$marriage,
-                             levels=c("MarriedSP","MarriedSA","Seperated","Divorced","Widowed","Single"))
+                             levels=c("MarriedSP","MarriedSA","Separated","Divorced","Widowed","Single"))
 table(ipumsdata$marst, ipumsdata$marriage, exclude=NULL)
 
 #Employment status 
 ipumsdata$employment <- NA
-ipumsdata$employment[ipumsdata$empstat==0] <- "NA"
 ipumsdata$employment[ipumsdata$empstat==1] <- "Employed"
 ipumsdata$employment[ipumsdata$empstat==2] <- "Unemployed"
 ipumsdata$employment[ipumsdata$empstat==3] <- "NILF"
 ipumsdata$employment <- factor(ipumsdata$employment,
-                             levels=c("NA","Employed","Unemployed","NILF"))
+                             levels=c("Employed","Unemployed","NILF"))
 table(ipumsdata$empstat, ipumsdata$employment, exclude=NULL)
 
 #Health insurance through Indian Health Service
@@ -99,21 +98,6 @@ summary(ipumsdata$racecombo)
 ipumsdata$age[ipumsdata$age==0] <- NA
 summary(ipumsdata$age)
 
-ipumsdata$marriage[ipumsdata$marriage==0] <- NA
-summary(ipumsdata$marriage)
-
-ipumsdata$employment[ipumsdata$employment==0] <- NA
-summary(ipumsdata$employment)
-
-ipumsdata$ihs[ipumsdata$ihs==0] <- NA
-summary(ipumsdata$ihs)
-
-ipumsdata$privatehi[ipumsdata$ihs==0] <- NA
-summary(ipumsdata$privatehi)
-
-ipumsdata$anyhins[ipumsdata$ihs==0] <- NA
-summary(ipumsdata$anyhins)
-
 #Collapsing Variables 
 
 #Marriage
@@ -132,18 +116,19 @@ summary(ipumsdata$marriage)
 
 ipumsdata$employment <- factor(ifelse(ipumsdata$empstat==1, "Employed",
                                     ifelse(ipumsdata$empstat==2 |
-                                             ipumsdata$empstat==3,"Unemployed", NA)),
-                             levels=c("Employed","Unemployed"))
+                                             ipumsdata$empstat==3,"Nonemployed", NA)),
+                             levels=c("Employed","Nonemployed"))
 
 table(ipumsdata$empstat, ipumsdata$employment, exclude=NULL) 
 summary(ipumsdata$employment)
 
 #Metro status 
-ipumsdata$metros <- factor(ifelse(ipumsdata$marst==1, "NotMetro",
-                                    ifelse(ipumsdata$marst==2 |
-                                             ipumsdata$marst==3 |
-                                             ipumsdata$marst==4, "Metro", NA)),
-                             levels=c("Metro","NotMetro"))
+ipumsdata$metros <- factor(ifelse(ipumsdata$metro==0, "Mixed",
+                                  ifelse(ipumsdata$metro==1, "NotMetro",
+                                         ifelse(ipumsdata$metro==2 |
+                                                  ipumsdata$metro==3 |
+                                                  ipumsdata$metro==4, "Metro", NA))),
+                             levels=c("Metro","Mixed","NotMetro"))
 
 table(ipumsdata$metro, ipumsdata$metros, exclude=NULL) 
 summary(ipumsdata$metros)
