@@ -65,7 +65,7 @@ ipumsdata$anyhins <- NA
 ipumsdata$anyhins[ipumsdata$hcovany==1] <- "NotCovered"
 ipumsdata$anyhins[ipumsdata$hcovany==2] <- "Covered"
 ipumsdata$anyhins <- factor(ipumsdata$anyhins,
-                              levels=c("NotCovered","Covered"))
+                              levels=c("Covered","NotCovered"))
 table(ipumsdata$hcovany, ipumsdata$anyhins, exclude=NULL)
 
 #Metro status 
@@ -146,7 +146,7 @@ ipumsdata$hins <- ifelse(ipumsdata$ihs=="IHSCoverage","IHS",
 
 ipumsdata <- subset(ipumsdata, 
               select=c("hhwt","cluster","metro","strata","perwt","age","racecombo","marriage",
-                       "employment","anyhins","metros"))
+                       "employment","anyhins","metros","hins"))
 ipumsdata
 
 #final code to preserve formatting of final analytical dataset
