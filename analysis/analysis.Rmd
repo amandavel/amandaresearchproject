@@ -13,9 +13,42 @@ knitr::opts_chunk$set(echo = TRUE)
 source("check_packages.R")
 source("useful_functions.R")
 load("output/analytical_data.RData")
+library(viridis)
 ```
 
 # Introduction
 <a href="#top">Back to top</a>
 
 Use this R Markdown to perform the main analysis for the project. I use this basically as a lab notebook. It contains the main analysis and a variety of sensitivity analysis. The code in this documents serves as a baseline for the eventual tables and figures that will go into the paper. At the same time it will serve as a record of all supplementary analyses performed. 
+
+# Data and Methods
+
+
+##Weighting 
+
+# Analysis
+
+```{r Logit 1, echo=FALSE, error=FALSE, results='asis'}
+model.race <- glm((anyhins=="HealthInsurance")~(racecombo), 
+                    data=ipumsdata, family=binomial(logit),weights = )
+round(summary(model.race)$coef,3)
+```
+Logit 1 
+
+```{r Logit 2, echo=FALSE, error=FALSE, results='asis'}
+model.age <- glm((anyhins=="HealthInsurance")~age, 
+                  data=ipumsdata, family=binomial(logit))
+coef(model.age)
+```
+
+```{r Logit 3, echo=FALSE, error=FALSE, results='asis'}
+model.both <- update(model.age, .~.+race)
+predict_df <- expand.grid(age=18:65, race=c("Female","Male"))
+lodds <- predict(model.both, newdata=predict_df)
+predict_df$probs <- exp(lodds)/(1+exp(lodds))
+ggplot(predict_df,
+       aes(x=fare, y=probs, color=sex))+
+  geom_line()+
+  labs(x="fare paid", y="probability of survival")+
+  theme_bw()
+```

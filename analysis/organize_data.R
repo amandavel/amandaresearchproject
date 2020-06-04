@@ -62,21 +62,21 @@ table(ipumsdata$hcovpriv, ipumsdata$privatehi, exclude=NULL)
 
 #Any health health insurance coverage
 ipumsdata$anyhins <- NA
-ipumsdata$anyhins[ipumsdata$hcovany==1] <- "NoHealthInsurance"
-ipumsdata$anyhins[ipumsdata$hcovany==2] <- "HealthInsurance"
+ipumsdata$anyhins[ipumsdata$hcovany==1] <- "NotCovered"
+ipumsdata$anyhins[ipumsdata$hcovany==2] <- "Covered"
 ipumsdata$anyhins <- factor(ipumsdata$anyhins,
-                              levels=c("NoHealthInsurance","HealthInsurance"))
+                              levels=c("NotCovered","Covered"))
 table(ipumsdata$hcovany, ipumsdata$anyhins, exclude=NULL)
 
 #Metro status 
 ipumsdata$metros <- NA
 ipumsdata$metros[ipumsdata$metro==0] <- "Mixed"
 ipumsdata$metros[ipumsdata$metro==1] <- "NotMetro"
-ipumsdata$metros[ipumsdata$metro==2] <- "CentralCity"
-ipumsdata$metros[ipumsdata$metro==3] <- "NotCentralCity"
+ipumsdata$metros[ipumsdata$metro==2] <- "MetroCC"
+ipumsdata$metros[ipumsdata$metro==3] <- "MetroNoCC"
 ipumsdata$metros[ipumsdata$metro==4] <- "CSMixed"
 ipumsdata$metros <- factor(ipumsdata$metros,
-                              levels=c("Mixed","NotMetro","CentralCity","NotCentralCity","CSMixed"))
+                              levels=c("NotMetro","Mixed","CSMixed","MetroNoCC","MetroCC"))
 table(ipumsdata$metro, ipumsdata$metros, exclude=NULL)
 
 ##Creating a racecombo variable and making it a factor variable
@@ -133,12 +133,20 @@ ipumsdata$metros <- factor(ifelse(ipumsdata$metro==0, "Mixed",
 table(ipumsdata$metro, ipumsdata$metros, exclude=NULL) 
 summary(ipumsdata$metros)
 
+##Creating the One True Health Insurance Variable
+
+ipumsdata$hins <- ifelse(ipumsdata$ihs=="IHSCoverage","IHS", 
+                         ifelse(ipumsdata$privatehi=="PrivateHINS","Private",
+                                ifelse(ipumsdata$anyhins=="HealthInsurance", "Public", 
+                                       ifelse(ipumsdata$anyhins=="NoHealthInsurance","None",
+                                              NA))))
+
 
 ##Removing all unneeded variables
 
 ipumsdata <- subset(ipumsdata, 
               select=c("hhwt","cluster","metro","strata","perwt","age","racecombo","marriage",
-                       "employment","ihs","privatehi","anyhins","metros"))
+                       "employment","anyhins","metros"))
 ipumsdata
 
 #final code to preserve formatting of final analytical dataset
