@@ -23,19 +23,19 @@ Use this R Markdown to perform the main analysis for the project. I use this bas
 
 # Data and Methods
 
-
 ##Weighting 
+
 
 # Analysis
 
-```{r Logit 1, echo=FALSE, error=FALSE, results='asis'}
-model.race <- glm((anyhins=="HealthInsurance")~(racecombo), 
+```{r Logit Race Model, echo=FALSE, error=FALSE, results='asis'}
+model.race <- glm((anyhins=="Covered")~(racecombo), 
                     data=ipumsdata, family=binomial(logit),weights = )
 round(summary(model.race)$coef,3)
 ```
-Logit 1 
+The race model, before exponentiating and converting these values to probabilities, I can see that whites (the reference category) have the highest probabilty of having any health insurance. AIANs, on the other hand, have by far the lowest probability of having any health insurance coverage. 
 
-```{r Logit 2, echo=FALSE, error=FALSE, results='asis'}
+```{r Logit Age Model, echo=FALSE, error=FALSE, results='asis'}
 model.age <- glm((anyhins=="HealthInsurance")~age, 
                   data=ipumsdata, family=binomial(logit))
 coef(model.age)
