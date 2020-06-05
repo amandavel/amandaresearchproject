@@ -28,27 +28,150 @@ Use this R Markdown to perform the main analysis for the project. I use this bas
 
 # Analysis
 
+First, I want to see the proportions of health insurance I'm working with. 
+
+```{r Data Overview echo=FALSE, error=FALSE, results='asis'}
+table(ipumsdata$hins)
+prop.table(table(ipumsdata$hins))
+table(ipumsdata$anyhins)
+prop.table(table(ipumsdata$anyhins))
+table(ipumsdata$racecombo)
+prop.table(table(ipumsdata$racecombo))
+```
+
 ```{r Logit Race Model, echo=FALSE, error=FALSE, results='asis'}
 model.race <- glm((anyhins=="Covered")~(racecombo), 
                     data=ipumsdata, family=binomial(logit),weights = )
 round(summary(model.race)$coef,3)
+
+exp(coef(model.race))
+
 ```
 The race model, before exponentiating and converting these values to probabilities, I can see that whites (the reference category) have the highest probabilty of having any health insurance. AIANs, on the other hand, have by far the lowest probability of having any health insurance coverage. 
 
+
+
 ```{r Logit Age Model, echo=FALSE, error=FALSE, results='asis'}
-model.age <- glm((anyhins=="HealthInsurance")~age, 
+model.age <- glm((anyhins=="Covered")~age, 
                   data=ipumsdata, family=binomial(logit))
 coef(model.age)
+
+exp(coef(model.age))
+
 ```
 
-```{r Logit 3, echo=FALSE, error=FALSE, results='asis'}
-model.both <- update(model.age, .~.+race)
-predict_df <- expand.grid(age=18:65, race=c("Female","Male"))
+The age model shows that a one year increase in age is associated with an increase in the predicated probability of healthcare coverage.
+
+```{r Logit Age Graph, echo=FALSE, error=FALSE, results='asis'}
+predict_df <- data.frame(age=18:65)
+lodds <- predict(model.age, newdata=predict_df)
+predict_df$probs <- exp(lodds)/(1+exp(lodds))
+ggplot(predict_df,
+       aes(x=age, y=probs))+
+  geom_line()+
+  labs(x="age", y="probability of health care coverage")+
+  theme_bw()
+
+exp(coef(model.age))
+```
+The age model shows an increase in the predicted probability of health care coverage as age increases. The average 18 year old, without taking any other independent variables into account, has a. A one year increase 
+
+**Why are the numbers different between age graph + model? 
+```{r Logit Race and Age Graph, echo=FALSE, error=FALSE, results='asis'}
+model.raceage <- update(model.age, .~.+racecombo)
+predict_df <- expand.grid(age=18:65, racecombo=c("NH White", "NH Black", "Hispanic", "NH API", "NH AIAN", "NH Other/Multi"))
 lodds <- predict(model.both, newdata=predict_df)
 predict_df$probs <- exp(lodds)/(1+exp(lodds))
 ggplot(predict_df,
-       aes(x=fare, y=probs, color=sex))+
+       aes(x=age, y=probs, color=racecombo))+
   geom_line()+
-  labs(x="fare paid", y="probability of survival")+
+  labs(x="Age", y="Probability of Health Care Coverage",
+       title="Predicted Probability of Health Care Coverage by Race and Age",caption="IPUMS 2017-2018", color="Race")+
   theme_bw()
+
+exp(coef(model.raceage))
+
+```
+
+The combined age and race model still shows an increase in the predicted probability of health care coverage as age increases, but has vastly differenct effects for race. 
+
+```{r Logit Metro Status and Age Graph, echo=FALSE, error=FALSE, results='asis'}
+
+model.metrosage <- update(model.age, .~.+metros)
+predict_df <- expand.grid(age=18:65, metros=c("Metro","Mixed","NotMetro"))
+lodds <- predict(model.metrosage, newdata=predict_df)
+predict_df$probs <- exp(lodds)/(1+exp(lodds))
+ggplot(predict_df,
+       aes(x=age, y=probs, color=metros))+
+  geom_line()+
+  labs(x="Age", y="Probability of Health Care Coverage",
+       title="Predicted Probability of Health Care Coverage by Metro Status and Age",
+       caption="IPUMS 2017-2018",
+       color="Metro Status")+
+  theme_bw()
+
+exp(coef(model.metrosage))
+```
+
+The metro status and age model still shows an increase in the predicted probability of health care coverage as age increases, but mixed metro and non-metro status and non-metro status have far a far lower predicted probability of having health care coverage. 
+
+``` {R Complex Logit Model echo=FALSE, error=FALSE, results='asis'}
+model.healthcare <- glm(anyhins~I(age-42)+I((age-42)^2)+metros*racecombo, 
+                     data=ipumsdata, family=binomial(logit))
+round(summary(model.healthcare)$coef, 3)
+
+exp(coef(model.healthcare))
+
+```
+This a very complex model. 
+```{R BIC and BIC' Comparison echo=FALSE, error=FALSE, results='asis'}
+p1 <- length(coef(model.raceage))-1
+p2 <- length(coef(model.healthcare))-1
+(model.healthcare$deviance-model.raceage$deviance)+(p2-p1)*log(nrow(ipumsdata))
+
+BIC.null.glm <- function(model) {
+    n <- length(model$resid)
+    p <- length(model$coef)-1
+    return((model$deviance-model$null.deviance)+p*log(n))
+}
+BIC.null.glm(model.raceage)
+
+BIC.null.glm <- function(model) {
+    n <- length(model$resid)
+    p <- length(model$coef)-1
+    return((model$deviance-model$null.deviance)+p*log(n))
+}
+BIC.null.glm(model.healthcare)
+```
+
+The BIC comparison shows a preference for the complex healthcare model with a result of -29675.59. Both the race and age and complex healthcare model are preffered to the null BIC' model. 
+
+```{r Polytomous Model echo=FALSE, error=TRUE, results='asis', include=FALSE}
+library(nnet)
+model.full <- multinom(anyhins~racecombo+metros+age+marriage+employment,
+                       data=ipumsdata)
+round(coef(model.full),5)
+
+x <- 18:65
+fakedata <- data.frame(racecombo=rep("NH AIAN",length(x)), 
+                       metros=rep("NotMetro",length(x)),
+                       marriage=rep("NotMarried",length(x)),
+                       employment=rep("NonEmployed",length(x)),
+                       age=x-18, agesq=(x-18)^2)
+predicted.probs <- predict(model.full, fakedata, type="probs")
+head(predicted.probs)
+
+temp <- as.data.frame.table(predicted.probs)
+colnames(temp) <- c("index","racecombo","prob")
+head(temp, n=3)
+
+ggplot(temp, aes(x=age+18, y=prob, 
+                 fill=racecombo))+
+  geom_area()+
+  scale_y_continuous(labels=scales::percent)+
+  labs(x="age", y="probability", 
+       fill="racial identification")
+```
+
+```{r Polytomous Model echo=FALSE, error=FALSE, results='asis'}
 ```
