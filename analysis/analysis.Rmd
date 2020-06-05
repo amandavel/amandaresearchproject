@@ -30,7 +30,7 @@ Use this R Markdown to perform the main analysis for the project. I use this bas
 
 First, I want to see the proportions of health insurance I'm working with. 
 
-```{r Data Overview echo=FALSE, error=FALSE, results='asis'}
+```{r Data Overview, echo=FALSE, error=FALSE, results='asis'}
 table(ipumsdata$hins)
 prop.table(table(ipumsdata$hins))
 table(ipumsdata$anyhins)
@@ -80,7 +80,7 @@ The age model shows an increase in the predicted probability of health care cove
 ```{r Logit Race and Age Graph, echo=FALSE, error=FALSE, results='asis'}
 model.raceage <- update(model.age, .~.+racecombo)
 predict_df <- expand.grid(age=18:65, racecombo=c("NH White", "NH Black", "Hispanic", "NH API", "NH AIAN", "NH Other/Multi"))
-lodds <- predict(model.both, newdata=predict_df)
+lodds <- predict(model.raceage, newdata=predict_df)
 predict_df$probs <- exp(lodds)/(1+exp(lodds))
 ggplot(predict_df,
        aes(x=age, y=probs, color=racecombo))+
@@ -115,7 +115,7 @@ exp(coef(model.metrosage))
 
 The metro status and age model still shows an increase in the predicted probability of health care coverage as age increases, but mixed metro and non-metro status and non-metro status have far a far lower predicted probability of having health care coverage. 
 
-``` {R Complex Logit Model echo=FALSE, error=FALSE, results='asis'}
+``` {R Complex Logit Model, echo=FALSE, error=FALSE, results='asis'}
 model.healthcare <- glm(anyhins~I(age-42)+I((age-42)^2)+metros*racecombo, 
                      data=ipumsdata, family=binomial(logit))
 round(summary(model.healthcare)$coef, 3)
@@ -124,7 +124,7 @@ exp(coef(model.healthcare))
 
 ```
 This a very complex model. 
-```{R BIC and BIC' Comparison echo=FALSE, error=FALSE, results='asis'}
+```{R BIC Comparison, echo=FALSE, error=FALSE, results='asis'}
 p1 <- length(coef(model.raceage))-1
 p2 <- length(coef(model.healthcare))-1
 (model.healthcare$deviance-model.raceage$deviance)+(p2-p1)*log(nrow(ipumsdata))
@@ -146,7 +146,7 @@ BIC.null.glm(model.healthcare)
 
 The BIC comparison shows a preference for the complex healthcare model with a result of -29675.59. Both the race and age and complex healthcare model are preffered to the null BIC' model. 
 
-```{r Polytomous Model echo=FALSE, error=TRUE, results='asis', include=FALSE}
+```{r Polytomous Model, echo=FALSE, error=TRUE, results='asis', include=FALSE}
 library(nnet)
 model.full <- multinom(anyhins~racecombo+metros+age+marriage+employment,
                        data=ipumsdata)
@@ -156,22 +156,8 @@ x <- 18:65
 fakedata <- data.frame(racecombo=rep("NH AIAN",length(x)), 
                        metros=rep("NotMetro",length(x)),
                        marriage=rep("NotMarried",length(x)),
-                       employment=rep("NonEmployed",length(x)),
+                       employment=rep("Nonemployed",length(x)),
                        age=x-18, agesq=(x-18)^2)
 predicted.probs <- predict(model.full, fakedata, type="probs")
 head(predicted.probs)
-
-temp <- as.data.frame.table(predicted.probs)
-colnames(temp) <- c("index","racecombo","prob")
-head(temp, n=3)
-
-ggplot(temp, aes(x=age+18, y=prob, 
-                 fill=racecombo))+
-  geom_area()+
-  scale_y_continuous(labels=scales::percent)+
-  labs(x="age", y="probability", 
-       fill="racial identification")
-```
-
-```{r Polytomous Model echo=FALSE, error=FALSE, results='asis'}
 ```

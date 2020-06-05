@@ -137,8 +137,8 @@ summary(ipumsdata$metros)
 
 ipumsdata$hins <- ifelse(ipumsdata$ihs=="IHSCoverage","IHS", 
                          ifelse(ipumsdata$privatehi=="PrivateHINS","Private",
-                                ifelse(ipumsdata$anyhins=="HealthInsurance", "Public", 
-                                       ifelse(ipumsdata$anyhins=="NoHealthInsurance","None",
+                                ifelse(ipumsdata$anyhins=="Covered", "Public", 
+                                       ifelse(ipumsdata$anyhins=="NotCovered","None",
                                               NA))))
 
 
