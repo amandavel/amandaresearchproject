@@ -1,15 +1,15 @@
 ---
 output:
+  html_document:
+    pandoc_args: './paper_info.yaml'
+  word_document:
+    pandoc_args: './paper_info.yaml'
+    reference_docx: ./resources/aog_word_style.docx
   pdf_document:
     pandoc_args: './paper_info.yaml'
     citation_package: natbib
     fig_caption: yes
     template: ./resources/aog-latex-ms.tex
-  word_document:
-    pandoc_args: './paper_info.yaml'
-    reference_docx: ./resources/aog_word_style.docx
-  html_document:
-    pandoc_args: './paper_info.yaml'
 fontfamily: mathpazo
 fontsize: 11pt
 anonymous: false
@@ -123,6 +123,7 @@ round(coef(model.full),5)
 ```
 # Conclusions
 In this study, I aimed to measure the association between race and access to healthcare by asking the extent to which Indigenous populations in the United States have access to healthcare, and how this relationship is correlated with urban versus rural status and employment. I hypothesized than non-metro areas would have less access to healthcare than urban areas due to health disparities and lack of access in the United States. I also applied this negative correlation of access to NH AIAN communities, which are proportionately more rural than whites. I preliminarily found that AIAN status is associated with a far greater probability of having no health insurance than whites. Also, non-metro and mixed metro status is associated with a far lower probability of health insurance coverage than metro area residents. Employment is additionally negatively correlated with health insurance coverage, affirming my hypothesis. Further research needs to be done on healthcare access across private, public, and IHS plans, specifically how coverage from these different sources shifts between races and across metro areas. Marriage status and employment additionally could be more comprehensively addressed, and employment by urbanicity versus rural status could present further findings.
+
 # References
 
 Dynamics under the Affordable Care Act.” Current Sociology 63(5):746–62.
