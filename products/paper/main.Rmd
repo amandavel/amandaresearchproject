@@ -22,24 +22,105 @@ biblio-style: ./resources/ajs.bst
 # If you want to do things in one R Markdown document then use the 
 # chunk option eval to toggle between running with and without 
 # compiling R code chunks
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, error = FALSE, warning = FALSE, 
-                      eval = TRUE)
-#load data
-#load libraries
+#knitr::opts_chunk$set(echo = FALSE, message = FALSE, error = FALSE, warning = FALSE, 
+#eval = TRUE)
+source("../../analysis/check_packages.R")
+source("../../analysis/useful_functions.R")
+load("../../analysis/output/analytical_data.RData")
+library(texreg)
+library(viridis)
 ```
 
 # Introduction
 
 Healthcare in the United States, while not restricted in variety, poses several barriers for individual access to its services. Private healthcare insurance provides the socially desired increase in choice of options, but often results in higher out of pocket costs and deductibles (Doonan et al. 2015). As a result, only the wealthy few with little to no health issues benefit. Medicare additionally provides significant choice, “but also entails significant out-of-pocket costs for its seniors and disabled beneficiaries” (Doonan et al. 2015, 755). Medicaid promises to give recipients open choice to providers, but the federal government allows states to secure waivers to instead provide a limited network (Doonan et al. 2015). Widespread use of Multiplan networks adds another node of complication to understanding access and coverage. This apparent limitless quantity of options has not, however, resulted in an increase in the quality of care recipients receive. As of 2011, “just under one-quarter of the inhabitants of the more developed regions lived in rural areas,” and while urban centers are generally assumed to be “less-healthy due to higher levels of overcrowding, air pollution, and stress,” they are in fact more healthy than their rural counterparts (Hughes 2019). Rural communities, specifically rural Indigenous communities in the United States, have unprecedented health disparities and limited regularity of healthcare (Kruse et al. 2016). 
 
-In this study, I aim to measure the association between race and access to healthcare, which will be quantified in health insurance coverage. Specifically, I am asking to what extent do Indigenous populations in the United States have access to healthcare, and how is this correlated with urban versus rural status and class? Recent studies have criticized the overall biomedical approach of healthcare in the United States that has “developed over the last two centuries from heteropatriarchal assumptions of women as reproducers,” but few have solely focused on Indigenous communities in the United States and analyzed urban versus rural status as a higher level effect (Gurr 2014, 39). This interaction additionally has not taken into consideration the Indian Health System, or IHS, which “is a nationwide network of hospitals and clinics that services 1.9 million American Indians and Alaskan Natives who belong to some 564 tribes across 35 states with only $4.4 billion” (Kruse et al. 2016, 1). The IHS operates independently with limited resources, and the population served by this network have exacerbated rates of type 2 diabetes, cardiovascular disease, and the highest national rate of substance abuse (Kruse et al. 2016). Through use of IPUMS census data, I will integrate these considerations into my analysis of Indigenous access to healthcare.
+In this study, I aim to measure the association between race and access to healthcare, which will be quantified in health insurance coverage. Specifically, I am asking to what extent do Indigenous populations in the United States have access to healthcare, and how is this correlated with urban versus rural status and employment? Recent studies have criticized the overall biomedical approach of healthcare in the United States that has “developed over the last two centuries from heteropatriarchal assumptions of women as reproducers,” but few have solely focused on Indigenous communities in the United States and analyzed urban versus rural status as a higher level effect (Gurr 2014, 39). This interaction additionally has not taken into consideration the Indian Health System, or IHS, which “is a nationwide network of hospitals and clinics that services 1.9 million American Indians and Alaskan Natives who belong to some 564 tribes across 35 states with only $4.4 billion” (Kruse et al. 2016, 1). The IHS operates independently with limited resources, and the population served by this network have exacerbated rates of type 2 diabetes, cardiovascular disease, and the highest national rate of substance abuse (Kruse et al. 2016). Through use of IPUMS census data, I will integrate these considerations into my analysis of Indigenous access to healthcare. 
 
 # Data and Methods
 
-The data used in this study was sourced from IPUMS USA, an organization that provides access to United States census data with enhanced documentation. The data was accessed on May 5th via data extract function on the organization's website. The sample includes 3,064 households and 6,405 indivuals from 2017 to 2018, and it is generalizable to the population of the United States. 
+The data used in this study was sourced from IPUMS USA, an organization that provides access to United States census data with enhanced documentation. The data was accessed on May 5th via data extract function on the organization's website. The sample includes 3,064 households and 6,405 indivuals from 2017 to 2018, and it is generalizable to the population of the United States. The data analysis includes seven primary variables: age, narrowed from 18 to 65; racecombo, which accounts for both race and ethnicity; marriage, measured in either married or not married; employment, measured in employed, nonemployed, and not in labor force (NILF); anyhins, which measures any health insurance coverage; metros, which addresses metro status, measured as residence in a metro area, a non-metro area, operationalized as rural, and mixed non-metro and metro status; and finally, hins, which measures health insurance coverage through private, IHS, public, and no coverage. Additional variables accounted for are hhwt, cluster, strata, and perwt. These variables will be used to account for clustering, stratification, and sampling weights. Future analysis will include a consideration of design effects and models will be weighted to account for proportions and cluster sampling. As such, the following analysis is limited due to unequal proportions of race representation in the studied data. Additionally, rurality cannot be confirmed in the data, only non-Metro area residential staus. Therefore suburban and other non-rural areas have the propensity to be absorbed into the non-Metro variable. The non-Hispanic American Indian Alaskan Native variable is additionally unreliable due to non-representational self-reporting; as a result, the results may be biased due to this. 
 
 # Results
+
+In the bar graph of metro area by race, I can see that a greater proportion of NH AIAN reside in non-metro areas than both metro and mixed  areas. Whites are the majority in all residential areas, but interestingly the greatest proportion of whites is found in non-metro areas. In the Logit graph modeling the predicted probability of health care coverage by race and age, I observe that an increase in the predicted probability of health care coverage as age increases, but has vastly differenct effects for race. In fact, a one year increase in age beginning at age eighteen is associated with a 101.5% increase in the predicted probability health insurance coverage for whites, a 115.6% increase for Asian and Pacific Islanders, and only a 24% increase for American Indians and Alaskan Natives. AIAN have the lowest yearly increase, 7.7% below Hispanic individuals. In the predicted probability of health care coverage by metro status and age graph, a one year increase in age beginning at age eighteen is associated with a 102.0% increase in the predicted probability of health insurance coverage for those in metro areas, a 71.2% increase for mixed metro and non-metro areas, and a 72.8% increase in non-metro areas. Surprisingly, non-metro areas have a slighly higher rate of predicted health insurance coverage than mixed areas. 
+
+In the GLM Logit Model of Probability of Health Insurance Coverage by Race and Metro Area, I can see that without holding any other independent variables constant, non-Hispanic American Indians and Alaskan Natives (NH AIAN) are 4.2 times less likely to have any health insurance coverage than whites. When holding constant metro area, NH AIAN are 3.6 times less likely to have any health insurance coverage than whites. When holding race constant, individuals in non-metro, rural areas are 1.7 less likely to have any health insurace coverage than their metro residing counterparts. Interestingly, NH AIAN individuals in non-metro residential areas are 1.04 times more likely to have health insurance coverage than non-metro whites. I hypothesize that this result is due to a higher proportion of non-metro AIAN to metro residing AIAN than whites, and the existence of the Indigenous-specifc IHS health care system. 
+
+```{r Boxplot Race and Metro Area, echo=FALSE}
+ggplot(ipumsdata, aes(x=racecombo, y=..prop.., group=1))+
+  geom_bar(fill="aquamarine")+
+  coord_flip()+
+  facet_wrap(~metros)+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x=NULL, y=NULL, 
+       title="Bar Graph of Metro Area by Race")+
+  theme_bw()
+```
+
+```{r Logit Race and Age Graph, echo=FALSE, error=FALSE}
+model.age <- glm((anyhins=="Covered")~age, 
+                  data=ipumsdata, family=binomial(logit))
+
+model.raceage <- update(model.age, .~.+racecombo)
+predict_df <- expand.grid(age=18:65, racecombo=c("NH White", "NH Black", "Hispanic", "NH API", "NH AIAN", "NH Other/Multi"))
+lodds <- predict(model.raceage, newdata=predict_df)
+predict_df$probs <- exp(lodds)/(1+exp(lodds))
+ggplot(predict_df,
+       aes(x=age, y=probs, color=racecombo))+
+  geom_line()+
+  labs(x="Age", y="Probability of Health Care Coverage",
+       title="Predicted Probability of Health Care Coverage by Race and Age",caption="IPUMS 2017-2018", color="Race")+
+  theme_bw()
+
+exp(coef(model.raceage))
+
+```
+
+```{r Logit Metro Status and Age Graph, echo=FALSE, error=FALSE}
+
+model.metrosage <- update(model.age, .~.+metros)
+predict_df <- expand.grid(age=18:65, metros=c("Metro","Mixed","NotMetro"))
+lodds <- predict(model.metrosage, newdata=predict_df)
+predict_df$probs <- exp(lodds)/(1+exp(lodds))
+ggplot(predict_df,
+       aes(x=age, y=probs, color=metros))+
+  geom_line()+
+  labs(x="Age", y="Probability of Health Care Coverage",
+       title="Predicted Probability of Health Care Coverage by Metro Status and Age",
+       caption="IPUMS 2017-2018",
+       color="Metro Status")+
+  theme_bw()
+
+exp(coef(model.metrosage))
+```
+
+```{r GLM Logit Model, echo=FALSE, results='asis'}
+ipumsdata$anyhins <- relevel(ipumsdata$anyhins, "NotCovered")
+ipumsdata$racecombo <- relevel(ipumsdata$racecombo, "NH White")
+model.racec <- glm(anyhins~racecombo, data=ipumsdata, family=binomial(logit))
+model.racecmetros <- update(model.racec, .~.+metros)
+model.interact <- update(model.racecmetros,.~.+racecombo*metros)
+texreg(list(model.racec, model.racecmetros, model.interact),
+       caption="GLM Logit Model of Probability of Health Insurance Coverage by Race and Metro Area",
+       digits = 3,
+       caption.above=TRUE, 
+       include.rsquared=TRUE,
+       include.adjrs=FALSE,
+       include.nobs=TRUE,
+       include.rmse=FALSE)
+```
+
 
 # Conclusions
 
 # References
+
+Dynamics under the Affordable Care Act.” Current Sociology 63(5):746–62.
+
+Gurr, Barbara. 2014. Reproductive Justice: The Politics of Health Care for Native American Women. Rutgers University Press.
+
+Hughes, Clarissa. 2019. “Rural Health.” Second Opinion: An Introduction to Health Sociology 205–27.
+
+Kruse, Clemens Scott, Shelby Bouffard, Michael Dougherty, and Jenna Stewart Parro. 2016. “Telemedicine Use in Rural Native American Communities in the Era of the ACA: A Systematic Literature Review.” Journal of Medical Systems 40(6):145.
+

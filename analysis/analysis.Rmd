@@ -1,11 +1,14 @@
 ---
 title: "Analysis for Project"
-output: 
-  html_document: 
+output:
+  html_document:
     fig_height: 6
     fig_width: 9
     toc: yes
     toc_depth: 4
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
 ---
 
 ```{r setup, include=FALSE}
@@ -14,6 +17,7 @@ source("check_packages.R")
 source("useful_functions.R")
 load("output/analytical_data.RData")
 library(viridis)
+library(texreg)
 ```
 
 # Introduction
@@ -21,16 +25,11 @@ library(viridis)
 
 Use this R Markdown to perform the main analysis for the project. I use this basically as a lab notebook. It contains the main analysis and a variety of sensitivity analysis. The code in this documents serves as a baseline for the eventual tables and figures that will go into the paper. At the same time it will serve as a record of all supplementary analyses performed. 
 
-# Data and Methods
-
-##Weighting 
-
-
 # Analysis
 
 First, I want to see the proportions of health insurance I'm working with. 
 
-```{r Data Overview, echo=FALSE, error=FALSE, results='asis'}
+```{r Data Overview, echo=FALSE, error=FALSE}
 table(ipumsdata$hins)
 prop.table(table(ipumsdata$hins))
 table(ipumsdata$anyhins)
@@ -39,7 +38,7 @@ table(ipumsdata$racecombo)
 prop.table(table(ipumsdata$racecombo))
 ```
 
-```{r Logit Race Model, echo=FALSE, error=FALSE, results='asis'}
+```{r Logit Race Model, echo=FALSE, error=FALSE}
 model.race <- glm((anyhins=="Covered")~(racecombo), 
                     data=ipumsdata, family=binomial(logit),weights = )
 round(summary(model.race)$coef,3)
@@ -51,7 +50,7 @@ The race model, before exponentiating and converting these values to probabiliti
 
 
 
-```{r Logit Age Model, echo=FALSE, error=FALSE, results='asis'}
+```{r Logit Age Model, echo=FALSE, error=FALSE}
 model.age <- glm((anyhins=="Covered")~age, 
                   data=ipumsdata, family=binomial(logit))
 coef(model.age)
@@ -62,7 +61,7 @@ exp(coef(model.age))
 
 The age model shows that a one year increase in age is associated with an increase in the predicated probability of healthcare coverage.
 
-```{r Logit Age Graph, echo=FALSE, error=FALSE, results='asis'}
+```{r Logit Age Graph, echo=FALSE, error=FALSE}
 predict_df <- data.frame(age=18:65)
 lodds <- predict(model.age, newdata=predict_df)
 predict_df$probs <- exp(lodds)/(1+exp(lodds))
@@ -77,7 +76,7 @@ exp(coef(model.age))
 The age model shows an increase in the predicted probability of health care coverage as age increases. The average 18 year old, without taking any other independent variables into account, has a. A one year increase 
 
 **Why are the numbers different between age graph + model? 
-```{r Logit Race and Age Graph, echo=FALSE, error=FALSE, results='asis'}
+```{r Logit Race and Age Graph, echo=FALSE, error=FALSE}
 model.raceage <- update(model.age, .~.+racecombo)
 predict_df <- expand.grid(age=18:65, racecombo=c("NH White", "NH Black", "Hispanic", "NH API", "NH AIAN", "NH Other/Multi"))
 lodds <- predict(model.raceage, newdata=predict_df)
@@ -95,7 +94,7 @@ exp(coef(model.raceage))
 
 The combined age and race model still shows an increase in the predicted probability of health care coverage as age increases, but has vastly differenct effects for race. 
 
-```{r Logit Metro Status and Age Graph, echo=FALSE, error=FALSE, results='asis'}
+```{r Logit Metro Status and Age Graph, echo=FALSE, error=FALSE}
 
 model.metrosage <- update(model.age, .~.+metros)
 predict_df <- expand.grid(age=18:65, metros=c("Metro","Mixed","NotMetro"))
@@ -115,7 +114,7 @@ exp(coef(model.metrosage))
 
 The metro status and age model still shows an increase in the predicted probability of health care coverage as age increases, but mixed metro and non-metro status and non-metro status have far a far lower predicted probability of having health care coverage. 
 
-``` {R Complex Logit Model, echo=FALSE, error=FALSE, results='asis'}
+``` {R Complex Logit Model, echo=FALSE, error=FALSE}
 model.healthcare <- glm(anyhins~I(age-42)+I((age-42)^2)+metros*racecombo, 
                      data=ipumsdata, family=binomial(logit))
 round(summary(model.healthcare)$coef, 3)
@@ -124,7 +123,7 @@ exp(coef(model.healthcare))
 
 ```
 This a very complex model. 
-```{R BIC Comparison, echo=FALSE, error=FALSE, results='asis'}
+```{R BIC Comparison, echo=FALSE, error=FALSE}
 p1 <- length(coef(model.raceage))-1
 p2 <- length(coef(model.healthcare))-1
 (model.healthcare$deviance-model.raceage$deviance)+(p2-p1)*log(nrow(ipumsdata))
@@ -146,7 +145,7 @@ BIC.null.glm(model.healthcare)
 
 The BIC comparison shows a preference for the complex healthcare model with a result of -29675.59. Both the race and age and complex healthcare model are preffered to the null BIC' model. 
 
-```{r Polytomous Model, echo=FALSE, error=TRUE, results='asis', include=FALSE}
+```{r Polytomous Model, echo=FALSE, error=TRUE, include=FALSE}
 library(nnet)
 model.full <- multinom(anyhins~racecombo+metros+age+marriage+employment,
                        data=ipumsdata)
@@ -160,4 +159,37 @@ fakedata <- data.frame(racecombo=rep("NH AIAN",length(x)),
                        age=x-18, agesq=(x-18)^2)
 predicted.probs <- predict(model.full, fakedata, type="probs")
 head(predicted.probs)
+```
+
+```{r GLM Logit Model, echo=FALSE, results='asis'}
+ipumsdata$anyhins <- relevel(ipumsdata$anyhins, "NotCovered")
+ipumsdata$racecombo <- relevel(ipumsdata$racecombo, "NH White")
+model.racec <- glm(anyhins~racecombo, data=ipumsdata, family=binomial(logit))
+model.racecmetros <- update(model.racec, .~.+metros)
+model.interact <- update(model.racecmetros,.~.+racecombo*metros)
+texreg(list(model.racec, model.racecmetros, model.interact),
+       caption="GLM Logit Model of Probability of Health Insurance Coverage by Race and Metro Area",
+       digits = 3,
+       caption.above=TRUE, 
+       include.rsquared=TRUE,
+       include.adjrs=FALSE,
+       include.nobs=TRUE,
+       include.rmse=FALSE)
+```
+
+```{r Table 1, echo=FALSE, results='asis'}
+model1 <- lm(pct_black~seidiff, data=met_area)
+model2 <- update(model1, .~.+unemployment+pct_college)
+model3 <- update(model2, .~.+pct_foreign_born)
+texreg(list(model1, model2, model3),
+       caption="Regression of Percent Black on SEI differece, Unemployment, College Degree, and Nativity",
+       custom.coef.names=c("Intercept","SEI Difference",
+                           "Unemployment Rate","Percent College",
+                           "Percent Foreign Born"),
+       digits = 3,
+       caption.above=TRUE, 
+       include.rsquared=TRUE,
+       include.adjrs=FALSE,
+       include.nobs=TRUE,
+       include.rmse=FALSE)
 ```
