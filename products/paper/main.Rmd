@@ -29,6 +29,7 @@ source("../../analysis/useful_functions.R")
 load("../../analysis/output/analytical_data.RData")
 library(texreg)
 library(viridis)
+library(nnet)
 ```
 
 # Introduction
@@ -111,7 +112,25 @@ texreg(list(model.racec, model.racecmetros, model.interact),
        include.rmse=FALSE)
 ```
 
+```{r Multinomial Polytomous Model, echo=FALSE, results='asis'}
+model.full <- multinom(anyhins~racecombo+metros+age+employment,
+                       data=ipumsdata)
+round(coef(model.full),5)
 
+predicted.probs <- predict(model.full, type="probs")
+head(predicted.probs)
+
+temp <- as.data.frame.table(predicted.probs)
+colnames(temp) <- c("index","race","prob")
+head(temp, n=3)
+
+ggplot(model.full, aes(x=age, y=prob, 
+                 fill=racecombo))+
+  geom_area()+
+  scale_y_continuous(labels=scales::percent)+
+  labs(x="age", y="probability", 
+       fill="racial identification")
+```
 # Conclusions
 
 # References
