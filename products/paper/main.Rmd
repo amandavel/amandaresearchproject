@@ -117,19 +117,14 @@ model.full <- multinom(anyhins~racecombo+metros+age+employment,
                        data=ipumsdata)
 round(coef(model.full),5)
 
-predicted.probs <- predict(model.full, type="probs")
-head(predicted.probs)
-
-temp <- as.data.frame.table(predicted.probs)
-colnames(temp) <- c("index","race","prob")
-head(temp, n=3)
-
-ggplot(model.full, aes(x=age, y=prob, 
-                 fill=racecombo))+
-  geom_area()+
-  scale_y_continuous(labels=scales::percent)+
-  labs(x="age", y="probability", 
-       fill="racial identification")
+texreg(list(model.full),
+       caption="Multinomial Polytomous Model of Probability of Health Insurance Coverage by Race, Metro Area, Age, and Employment",
+       digits = 3,
+       caption.above=TRUE, 
+       include.rsquared=TRUE,
+       include.adjrs=FALSE,
+       include.nobs=TRUE,
+       include.rmse=FALSE)
 ```
 # Conclusions
 
